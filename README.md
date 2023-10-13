@@ -7,6 +7,69 @@ docker compose up
 the app shoud now listen on port 8800,
 postgress port 5432
 
+##### Request examples:
+- to save data in db:
+```shell
+curl -X POST 'localhost:8800/?lat=10&lon=63&part=hourly,daily'
+```
+example output:
+```
+Succesfully saved
+```
+- to recieve saved data from database:
+```shell
+curl 'localhost:8800/?lat=10&lon=63&part=hourly,daily'
+```
+example output:
+```json
+{
+    "sunrise": 1697160972,
+    "sunset": 1697203934,
+    "temp": 301.86,
+    "feels_like": 304.6,
+    "pressure": 1011,
+    "humidity": 66,
+    "uvi": 7.91,
+    "wind_speed": 2.3
+}
+```
+- provide invalid data in post request:
+```shell
+curl -X POST 'localhost:8800/?lat=10&lon=663
+```
+example output:
+```json
+{
+    "statusCode":400,
+    "message":"wrong longitude"
+}
+```
+- try to get data that was not saved:
+
+```shell
+curl 'localhost:8800/?lat=20&lon=20
+```
+example output:
+```json
+{
+    "statusCode": 404,
+    "message": "Weather with these parameters not found in database"
+}
+```
+- try to get data with invalid parameters:
+
+```shell
+curl 'localhost:8800/?lat=20
+```
+example output:
+```json
+{
+    "message":["lon must be a number string"],
+    "error":"Bad Request",
+    "statusCode":400
+}
+```
+
 ##### To run for development or testing:
  - run the db in docker:
  ```shell
