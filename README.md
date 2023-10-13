@@ -1,13 +1,13 @@
 # Weather App
 
-##### To run in docker:
+### To run in docker:
 ```shell
 docker compose up
 ```
 the app shoud now listen on port 8800,
 postgress port 5432
 
-##### Request examples:
+### Request examples:
 - to save data in db:
 ```shell
 curl -X POST 'localhost:8800/?lat=10&lon=63&part=hourly,daily'
@@ -35,7 +35,7 @@ example output:
 ```
 - provide invalid data in post request:
 ```shell
-curl -X POST 'localhost:8800/?lat=10&lon=663
+curl -X POST 'localhost:8800/?lat=10&lon=663'
 ```
 example output:
 ```json
@@ -47,7 +47,7 @@ example output:
 - try to get data that was not saved:
 
 ```shell
-curl 'localhost:8800/?lat=20&lon=20
+curl 'localhost:8800/?lat=20&lon=20'
 ```
 example output:
 ```json
@@ -59,7 +59,7 @@ example output:
 - try to get data with invalid parameters:
 
 ```shell
-curl 'localhost:8800/?lat=20
+curl 'localhost:8800/?lat=20'
 ```
 example output:
 ```json
@@ -70,7 +70,7 @@ example output:
 }
 ```
 
-##### To run for development or testing:
+### To run for development or testing:
  - run the db in docker:
  ```shell
  docker compose up postgres
@@ -84,7 +84,7 @@ example output:
  npm run start:dev
  ```
 
-#### Requirements
+### Requirements
 Створити проджект на nest який буде фетчити дані із
 https://openweathermap.org/api/one-call-3#current
 І записувати в БД
