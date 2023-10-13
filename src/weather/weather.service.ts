@@ -14,7 +14,7 @@ export class WeatherService {
     async saveWeatherToDb(params: WeatherDto): Promise<string> {
         const data = await this.fetchData(params);
         await this.saveToDb(params, data);
-        return 'Succecfully saved';
+        return 'Succesfully saved';
     }
 
     async getWeather(params: WeatherDto): Promise<Weather> {
@@ -57,14 +57,14 @@ export class WeatherService {
     private async saveToDb(params: WeatherDto, data: WeatherData) {
         const { lat, lon, part } = params;
         const partArr = part ? (part.split(',') as Part[]) : [];
-        const record = this.weatherRepository.create({
+        const weather = this.weatherRepository.create({
             lat,
             lon,
             part: partArr,
             data,
         });
         try {
-            await this.weatherRepository.save(record);
+            await this.weatherRepository.save(weather);
         } catch (e) {
             console.log(e);
             throw new HttpException(
