@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Part, Weather, WeatherData } from './weather.entity';
 import { ArrayContains, Repository } from 'typeorm';
@@ -6,6 +6,8 @@ import { WeatherDto } from './dto/weather.dto';
 
 @Injectable()
 export class WeatherService {
+    private readonly logger = new Logger(WeatherService.name);
+
     constructor(
         @InjectRepository(Weather)
         private readonly weatherRepository: Repository<Weather>,
@@ -14,6 +16,7 @@ export class WeatherService {
     async saveWeatherToDb(params: WeatherDto): Promise<string> {
         const data = await this.fetchData(params);
         await this.saveToDb(params, data);
+        this.logger.log('Weather succesfully saved into database');
         return 'Succesfully saved';
     }
 
@@ -28,11 +31,12 @@ export class WeatherService {
             },
         });
         if (weather === null) {
-            throw new HttpException(
-                'Weather with these parameters not found in database',
-                HttpStatus.NOT_FOUND,
-            );
+            const message =
+                'Weather with these parameters not found in database';
+            this.logger.warn(message);
+            throw new HttpException(message, HttpStatus.NOT_FOUND);
         }
+        this.logger.log('Weather succesfully finded in database');
         return weather;
     }
 
@@ -43,14 +47,17 @@ export class WeatherService {
         );
         if (res.status === 400) {
             const error: { message: string } = await res.json();
+            this.logger.warn('API request failed cause of:', error.message);
             throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
         }
         if (!res.ok) {
+            this.logger.warn('API request failed unexpected');
             throw new HttpException(
                 `Failed to fetch weather data with latitude: ${lat}, longtitude: ${lon}, exclude parts: ${part}`,
                 HttpStatus.BAD_REQUEST,
             );
         }
+        this.logger.log('Weather succesfully fetched from weather service');
         return res.json();
     }
 
@@ -66,7 +73,7 @@ export class WeatherService {
         try {
             await this.weatherRepository.save(weather);
         } catch (e) {
-            console.log(e);
+            this.logger.error('Failed to save weather data into db', e);
             throw new HttpException(
                 'Failed to save weather data',
                 HttpStatus.INTERNAL_SERVER_ERROR,
